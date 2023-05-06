@@ -1,0 +1,38 @@
+import csv
+import pandas as pd 
+import os
+import math
+data = pd.read_csv('internal_all - internal_all.csv') #дописать ", header=1", если проблема при считывании заголовка
+data = data[['Address', 'H1-1', 'текст 1']]
+## Если в таблицу попали лишние страницы, их можно легко отфильтровать. Ниже примеры.
+# data = data[data['Status Code']==200] # Фильтруем страницы с 200 ответом
+# data = data[~data['Address'].str.contains('page')] # Фильтруем страницы не содержащие ""
+# data = data.drop(index=0)
+rows_in_rss = 1000 # количество строк в одном rss-канале
+total_rows = len(data) - 1
+total_xml_file = math.ceil((total_rows-1)/rows_in_rss)
+print('Всего в файле строк:', total_rows)
+print('Будет сгенерировано xml-файлов:', total_xml_file)
+
+#next step 
+
+def create_xml(item_count_next):
+    rss_file = open('rss{:.0f}.xml'.format(item_count_next/rows_in_rss), 'w', encoding="utf-8")
+    rss_file.write(
+    """<?xml version="1.0" encoding="UTF-8"?>
+        <rss xmlns:yandex="http://news.yandex.ru"
+            xmlns:media="http://search.yahoo.com/mrss/"
+            xmlns:turbo="http://turbo.yandex.ru"
+            version="2.0">
+            <channel>""")
+    rss_file.close()
+    
+    
+    def size_file(item_count_next):
+    
+    size_final_file_MB = os.path.getsize('rss{:.0f}.xml'.format(item_count_next/rows_in_rss))/1024/1024
+    
+    if size_final_file_MB < 15:
+        print('Файл создан')
+    else:
+        print('Нужно уменьшить шаг')
